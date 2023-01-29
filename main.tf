@@ -25,6 +25,14 @@ resource "azurerm_mssql_server" "this" {
   }
 }
 
+resource "azurerm_sql_firewall_rule" "this" {
+  name                = "MyNetwork"
+  resource_group_name = data.azurerm_resource_group.this.name
+  server_name         = azurerm_mssql_server.this.name
+  start_ip_address    = "185.102.185.1"
+  end_ip_address      = "185.102.185.254"
+}
+
 
 resource "azurerm_mssql_database" "this" {
   name           = "testinit-db"
