@@ -1,6 +1,6 @@
 variable "rg_name" {
   type = string
-  default = "initdb-rg"
+  default = "init-db"
 }
 
 variable "st_ac_name" {

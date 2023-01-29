@@ -3,14 +3,13 @@ locals {
 }
 
 data "azurerm_resource_group" "this" {
-  name     = "initdb-rg"
-  location = "West Europe"
+  name     = "initdb"
 }
 
 resource "azurerm_mssql_server" "this" {
-  name                         = "mssqlserver"
-  resource_group_name          = azurerm_resource_group.this.name
-  location                     = azurerm_resource_group.this.location
+  name                         = "test-server78"
+  resource_group_name          = data.azurerm_resource_group.this.name
+  location                     = data.azurerm_resource_group.this.location
   version                      = "12.0"
   administrator_login          = "azureadmin"
   administrator_login_password = var.DB_ADMIN_PASSWORD
