@@ -100,11 +100,7 @@ stages:
               backendAzureRmResourceGroupName: '$(rg_name)'
               backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
               backendAzureRmContainerName: '$(rem_container_name)'
-              backendAzureRmKey: '$(rem_key)'
-          - task: PowerShell@2
-            inputs:
-              targetType: 'inline'
-              script: 'Install-Module -Name SqlServer -AllowPrerelease -Force -Verbose -Scope CurrentUser'      
+              backendAzureRmKey: '$(rem_key)'    
           - task: TerraformTaskV3@3
             displayName: Apply
             inputs:
