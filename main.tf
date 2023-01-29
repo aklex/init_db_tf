@@ -57,8 +57,8 @@ resource "null_resource" "this" {
     always_run = "${timestamp()}"
   }
   provisioner "local-exec" {
-    command = "Invoke-Sqlcmd -ServerInstance ${azurerm_mssql_server.this.fully_qualified_domain_name} -Database ${azurerm_mssql_database.this.name} -Username ${azurerm_mssql_server.this.administrator_login} -Password ${TF_VAR_admin_password} -ConnectionTimeout 5 -InputFile ${local.sql_script} -Verbose 4>&1 | Out-String"
-    #command = "echo hello"
+    #command = "Invoke-Sqlcmd -ServerInstance ${azurerm_mssql_server.this.fully_qualified_domain_name} -Database ${azurerm_mssql_database.this.name} -Username ${azurerm_mssql_server.this.administrator_login} -Password ${TF_VAR_admin_password} -ConnectionTimeout 5 -InputFile ${local.sql_script} -Verbose 4>&1 | Out-String"
+    command = "echo ${azurerm_mssql_database.this.name}"
     interpreter = ["PowerShell", "-Command"]
   }
   depends_on = [azurerm_mssql_server.this, azurerm_mssql_database.this]
