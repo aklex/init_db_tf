@@ -1,5 +1,7 @@
 locals {
   env = "test"
+  sql_script = "./initdb.sql"
+  init_ps_script = "./initdb.ps1"
 }
 
 data "azurerm_resource_group" "this" {
@@ -46,5 +48,17 @@ resource "azurerm_mssql_database" "this" {
 
   tags = {
     environment = local.env
+  }
+}
+
+resource "null_resource" "this" {
+  trigger = {
+    always_run = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    command = "Invoke-Sqlcmd -ServerInstance ${azurerm_mssql_server.this.fully_qualified_domain_name} -Database ${azurerm_mssql_database.this.name} -Username ${azurerm_mssql_server.this.administrator_login} -Password ${TF_VAR_admin_password} -ConnectionTimeout 5 -InputFile ${local.sql_script} -Verbose 4>&1 | Out-String"
+    interpreter = [
+      "PowerShell", "-Command"
+    ]
   }
 }
