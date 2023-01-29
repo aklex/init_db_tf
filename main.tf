@@ -52,7 +52,7 @@ resource "azurerm_mssql_database" "this" {
 }
 
 resource "null_resource" "this" {
-  trigger = {
+  triggers = {
     always_run = "${timestamp()}"
   }
   provisioner "local-exec" {
