@@ -1,0 +1,77 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  rg_name: 'initdb-rg'
+  rem_storage_account_name: 'tfstate1048584444'
+  rem_container_name: 'tfstate'
+  rem_key: 'terraform.tfstate'
+
+stages:
+  - stage: TFPlanDestoy 
+    displayName: TF Plan Destoy 
+    jobs: 
+      - job: plan
+        continueOnError: false
+        steps:
+          - task: TerraformTaskV3@3
+            displayName: Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'serv-conn'
+              backendAzureRmResourceGroupName: '$(rg_name)'
+              backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
+              backendAzureRmContainerName: '$(rem_container_name)'
+              backendAzureRmKey: '$(rem_key)'
+          - task: TerraformTaskV3@3
+            displayName: Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              commandOptions: '-destroy'
+              environmentServiceNameAzureRM: 'serv-conn'
+  - stage: TFApprove
+    displayName: Manual approve
+    condition: succeeded('TFPlanDestoy')
+    dependsOn: TFPlanDestoy
+    pool: server
+    jobs:
+      - job: approve
+        displayName: Wait for approval
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 10
+            inputs:
+              instructions: 'Review changes and destroy'
+  - stage: TFDestroy
+    condition: succeeded('TFApprove') 
+    displayName: TF Destoy 
+    dependsOn: TFApprove
+    jobs: 
+      - job: destroy
+        continueOnError: false
+        steps:
+          - task: TerraformTaskV3@3
+            displayName: Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'serv-conn'
+              backendAzureRmResourceGroupName: '$(rg_name)'
+              backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
+              backendAzureRmContainerName: '$(rem_container_name)'
+              backendAzureRmKey: '$(rem_key)'
+          - task: TerraformTaskV3@3
+            displayName: Destroy
+            inputs:
+              provider: 'azurerm'
+              command: 'destroy'
+              commandOptions: '--auto-approve'
+              environmentServiceNameAzureRM: 'serv-conn'

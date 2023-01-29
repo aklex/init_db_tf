@@ -1,0 +1,107 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  rg_name: 'initdb-rg'
+  rem_storage_account_name: 'tfstate1048584444'
+  rem_container_name: 'tfstate'
+  rem_key: 'terraform.tfstate'
+
+stages:
+  - stage: TFvalidate
+    displayName: TF validate
+    jobs: 
+      - job: validate
+        continueOnError: false
+        steps:
+          - task: TerraformTaskV3@3
+            displayName: Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'serv-conn'
+              backendAzureRmResourceGroupName: '$(rg_name)'
+              backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
+              backendAzureRmContainerName: '$(rem_container_name)'
+              backendAzureRmKey: '$(rem_key)'
+          - task: TerraformTaskV3@3
+            displayName: Validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+  - stage: TFplan
+    displayName: TF plan
+    condition: succeeded('TFvalidate')
+    dependsOn: TFvalidate
+    jobs:
+      - job: plan
+        steps:
+          - task: TerraformTaskV3@3
+            displayName: Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'serv-conn'
+              backendAzureRmResourceGroupName: '$(rg_name)'
+              backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
+              backendAzureRmContainerName: '$(rem_container_name)'
+              backendAzureRmKey: '$(rem_key)'
+          - task: TerraformTaskV3@3
+            displayName: Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              commandOptions: '-out main.tfplan'
+              environmentServiceNameAzureRM: 'serv-conn'
+  - stage: TFApprove
+    displayName: Manual approve
+    condition: succeeded('TFplan')
+    dependsOn: TFplan
+    pool: server
+    jobs:
+      - job: approve
+        displayName: Wait for approval
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 120
+            inputs:
+              notifyUsers: 'aleksey.kabanov@gmail.com'
+              instructions: 'Review changes and apply'
+  - stage: TFapply
+    displayName: TF apply
+    condition: succeeded('TFApprove')
+    dependsOn: TFApprove
+    jobs:
+      - job: apply
+        steps:
+          - task: TerraformTaskV3@3
+            displayName: Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'serv-conn'
+              backendAzureRmResourceGroupName: '$(rg_name)'
+              backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
+              backendAzureRmContainerName: '$(rem_container_name)'
+              backendAzureRmKey: '$(rem_key)'
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: 'Install-Module -Name SqlServer -AllowPrerelease -Force -Verbose -Scope CurrentUser'      
+          - task: TerraformTaskV3@3
+            displayName: Apply
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '--auto-approve'
+              environmentServiceNameAzureRM: 'serv-conn'
+              commandOptions: -input=false -var "DB_ADMIN_PASSWORD=$(TF_VAR_admin_password)"
+
