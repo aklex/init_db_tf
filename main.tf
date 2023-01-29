@@ -1,7 +1,7 @@
 locals {
   env = "test"
-  sql_script = "./initdb.sql"
-  init_ps_script = "./initdb.ps1"
+  sql_script = ".\\initdb.sql"
+  init_ps_script = ".\\initdb.ps1"
 }
 
 data "azurerm_resource_group" "this" {
