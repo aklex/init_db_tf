@@ -25,7 +25,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
-              backendServiceArm: 'serv-conn'
+              backendServiceArm: 'init-db'
               backendAzureRmResourceGroupName: '$(rg_name)'
               backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
               backendAzureRmContainerName: '$(rem_container_name)'
@@ -36,7 +36,7 @@ stages:
               provider: 'azurerm'
               command: 'plan'
               commandOptions: '-destroy'
-              environmentServiceNameAzureRM: 'serv-conn'
+              environmentServiceNameAzureRM: 'init-db'
   - stage: TFApprove
     displayName: Manual approve
     condition: succeeded('TFPlanDestoy')
@@ -63,7 +63,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
-              backendServiceArm: 'serv-conn'
+              backendServiceArm: 'init-db'
               backendAzureRmResourceGroupName: '$(rg_name)'
               backendAzureRmStorageAccountName: '$(rem_storage_account_name)'
               backendAzureRmContainerName: '$(rem_container_name)'
@@ -74,4 +74,4 @@ stages:
               provider: 'azurerm'
               command: 'destroy'
               commandOptions: '--auto-approve'
-              environmentServiceNameAzureRM: 'serv-conn'
+              environmentServiceNameAzureRM: 'init-db'
