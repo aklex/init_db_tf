@@ -3,7 +3,7 @@ locals {
 }
 
 data "azurerm_resource_group" "this" {
-  name     = "initdb"
+  name     = "init-db"
 }
 
 resource "azurerm_mssql_server" "this" {

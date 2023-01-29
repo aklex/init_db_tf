@@ -7,10 +7,10 @@ trigger:
 - main
 
 pool:
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 variables:
-  rg_name: 'initdb-rg'
+  rg_name: 'init-db'
   rem_storage_account_name: 'tfstate1048584444'
   rem_container_name: 'tfstate'
   rem_key: 'terraform.tfstate'
