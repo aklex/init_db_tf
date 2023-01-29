@@ -25,10 +25,6 @@ stages:
           - task: TerraformInstaller@0
             inputs:
               terraformVersion: 'latest'
-          - task: TerraformCLI@0
-            displayName: 'Check terraform version'
-            inputs:
-              command: version
           - task: TerraformTaskV3@3
             displayName: Init
             inputs:
@@ -54,10 +50,6 @@ stages:
           - task: TerraformInstaller@0
             inputs:
               terraformVersion: 'latest'
-          - task: TerraformCLI@0
-            displayName: 'Check terraform version'
-            inputs:
-              command: version
           - task: TerraformTaskV3@3
             displayName: Init
             inputs:
@@ -99,10 +91,6 @@ stages:
           - task: TerraformInstaller@0
             inputs:
               terraformVersion: 'latest'
-          - task: TerraformCLI@0
-            displayName: 'Check terraform version'
-            inputs:
-              command: version
           - task: TerraformTaskV3@3
             displayName: Init
             inputs:
