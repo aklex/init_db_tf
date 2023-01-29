@@ -32,6 +32,7 @@ resource "azurerm_mssql_firewall_rule" "this" {
   server_id           = azurerm_mssql_server.this.id
   start_ip_address    = "185.102.185.1"
   end_ip_address      = "185.102.185.254"
+  depends_on = [azurerm_mssql_server.this]
 }
 
 
@@ -48,6 +49,7 @@ resource "azurerm_mssql_database" "this" {
   tags = {
     environment = local.env
   }
+  depends_on = [azurerm_mssql_server.this]
 }
 
 resource "null_resource" "this" {
@@ -56,9 +58,8 @@ resource "null_resource" "this" {
   }
   provisioner "local-exec" {
     #command = "Invoke-Sqlcmd -ServerInstance ${azurerm_mssql_server.this.fully_qualified_domain_name} -Database ${azurerm_mssql_database.this.name} -Username ${azurerm_mssql_server.this.administrator_login} -Password ${TF_VAR_admin_password} -ConnectionTimeout 5 -InputFile ${local.sql_script} -Verbose 4>&1 | Out-String"
-    command = "Write-Output 'Hello'"
-    interpreter = [
-      "PowerShell", "-Command"
-    ]
+    command = "echo hello"
+    interpreter = ["PowerShell", "-Command"]
   }
+  depends_on = [azurerm_mssql_server.this, azurerm_mssql_database.this]
 }
