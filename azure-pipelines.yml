@@ -65,7 +65,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'plan'
-              commandOptions: '-out main.tfplan -input=false -var "DB_ADMIN_PASSWORD=$(TF_VAR_admin_password)'
+              commandOptions: '-out main.tfplan -input=false -var "DB_ADMIN_PASSWORD=$(TF_VAR_admin_password)"'
               environmentServiceNameAzureRM: 'init-db'
   - stage: TFApprove
     displayName: Manual approve
@@ -110,6 +110,6 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'apply'
-              commandOptions: '--auto-approve -input=false -var "DB_ADMIN_PASSWORD=$(TF_VAR_admin_password)'
+              commandOptions: '--auto-approve -input=false -var "DB_ADMIN_PASSWORD=$(TF_VAR_admin_password)"'
               environmentServiceNameAzureRM: 'init-db'
 
