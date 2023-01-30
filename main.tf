@@ -27,6 +27,13 @@ resource "azurerm_mssql_server" "this" {
   }
 }
 
+resource "azurerm_mssql_firewall_rule" "this2" {
+  name                = "AllAzureServices"
+  server_id           = azurerm_mssql_server.this.id
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
+  depends_on = [azurerm_mssql_server.this]
+}
 resource "azurerm_mssql_firewall_rule" "this" {
   name                = "MyNetwork"
   server_id           = azurerm_mssql_server.this.id
@@ -34,6 +41,8 @@ resource "azurerm_mssql_firewall_rule" "this" {
   end_ip_address      = "185.102.185.254"
   depends_on = [azurerm_mssql_server.this]
 }
+
+
 
 
 resource "azurerm_mssql_database" "this" {
